@@ -22,6 +22,9 @@ app.use("/api", isAuthenticated, categoryRouter);
 const poseRouter = require("./routes/pose.routes"); 
 app.use("/api", isAuthenticated, poseRouter);     
 
+const favoriteRouter = require("./routes/favorite.routes"); 
+app.use("/api", isAuthenticated, favoriteRouter);     
+
 const authRouter = require("./routes/auth.routes");
 app.use("/auth", authRouter);                      
 
