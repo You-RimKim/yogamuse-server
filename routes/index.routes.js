@@ -12,4 +12,8 @@ router.get("/categories", (req, res, next) => {
   res.json("here are all the categories");
 });
 
+router.get("/user", (req, res, next) => {
+  res.json("here are all the users");
+});
+
 module.exports = router;

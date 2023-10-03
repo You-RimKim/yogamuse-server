@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Favorite = require("../models/Favorite.model");
+const Category = require('../models/Category.model');
 const {isAuthenticated} = require("../middleware/jwt.middleware")
 const mongoose = require("mongoose")
 
@@ -7,12 +8,15 @@ router.post('/add-favorite', async (req, res) => {
   const { _id } = req.payload;
   console.log(_id);
 
-  const foundFavorite = await Favorite.findOne({id : req.body.id});
+  // code below works but it's problematic:
+  // It also does not add for other users to favorites because it already exists in database
 
-  if (foundFavorite) {
-    res.send("category is already in favorites")
-    return
-  } 
+  // const foundFavorite = await Favorite.findOne({id : req.body.id});
+
+  // if (foundFavorite) {
+  //   res.send("category is already in favorites")
+  //   return
+  // } 
 
   // Include the API link in the favorite data
   const favoriteData = { user: _id, ...req.body, apiLink: `https://yoga-api-nzy4.onrender.com/v1/categories?name=${req.body.category_name}` };
@@ -53,6 +57,19 @@ router.get('/my-favorites/:favoriteId',isAuthenticated , async (req, res) => {
   } catch (error) {
     console.error("Error fetching favorite content:", error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// DELETE route for deleting a category by its ID
+router.delete('/my-favorites/:categoryId', async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+
+    await Category.findByIdAndRemove(categoryId);
+    res.status(200).json({ message: 'Category deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    res.status(500).json({ message: 'Server error', error });
   }
 });
 

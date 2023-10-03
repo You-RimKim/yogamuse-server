@@ -26,7 +26,10 @@ const favoriteRouter = require("./routes/favorite.routes");
 app.use("/api", isAuthenticated, favoriteRouter);     
 
 const authRouter = require("./routes/auth.routes");
-app.use("/auth", authRouter);                      
+app.use("/auth", authRouter);    
+
+const usersRouter = require("./routes/users.routes");
+app.use("/api", usersRouter);
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
