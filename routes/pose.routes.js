@@ -12,7 +12,7 @@ router.post("/poses", (req, res, next) => {
 const poses = async () => {
   await axios.get("https://yoga-api-nzy4.onrender.com/v1/categories")
 }
-console.log(poses())
+// console.log(poses())
 
 
 
