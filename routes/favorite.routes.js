@@ -29,6 +29,7 @@ router.post('/add-favorite', async (req, res) => {
     });
 });
 
+// Get all the favorite categories
 router.get('/my-favorites', async (req, res) => {
   const { _id } = req.payload;
 
@@ -60,6 +61,34 @@ router.get('/my-favorites/:favoriteId',isAuthenticated , async (req, res) => {
   }
 });
 
+// POST route for adding a favorite category
+router.post('/my-favorites', isAuthenticated, async (req, res) => {
+  const { _id } = req.payload;
+  const { category_name, category_description } = req.body;
+
+  try {
+    const existingFavorite = await Favorite.findOne({ user: _id, category_name });
+
+    if (existingFavorite) {
+      return res.status(400).json({ message: 'Category is already in favorites' });
+    }
+
+    // Create a new favorite category
+    const favoriteData = {
+      user: _id,
+      category_name,
+      category_description,
+      apiLink: `https://yoga-api-nzy4.onrender.com/v1/categories?name=${category_name}`,
+    };
+
+    const newFavorite = await Favorite.create(favoriteData);
+    res.status(201).json(newFavorite);
+  } catch (error) {
+    console.error("Error creating favorite category:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 // DELETE route for deleting a category by its ID
 router.delete('/my-favorites/:categoryId', async (req, res) => {
   try {
@@ -73,50 +102,41 @@ router.delete('/my-favorites/:categoryId', async (req, res) => {
   }
 });
 
+// POST route for adding a pose to a favorite category
+router.post('/my-favorites/:favoriteId/add-pose', isAuthenticated, async (req, res) => {
+  const { favoriteId } = req.params; 
+  const { english_name, sanskrit_name, pose_description, pose_benefits, url_png } = req.body;
+
+  try {
+    // Find the favorite category by ID
+    const favorite = await Favorite.findById(favoriteId);
+
+    if (!favorite) {
+      return res.status(404).json({ message: 'Favorite category not found' });
+    }
+
+    // Create a new pose object
+    const newPose = {
+      english_name,
+      sanskrit_name,
+      pose_description,
+      pose_benefits,
+      url_png,
+    };
+
+    // Add the new pose to the favorite category's poses array
+    favorite.poses.push(newPose);
+
+    // Save the updated favorite category
+    await favorite.save();
+
+    res.status(201).json(newPose); // Return the newly added pose
+  } catch (error) {
+    console.error('Error adding pose to favorite category:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
+
 module.exports = router;
-
-
-// const router = require("express").Router();
-// const Favorite = require("../models/Favorite.model");
-
-// router.post('/add-favorite', (req, res) => {
-//   const { _id } = req.payload;
-//   console.log(_id, req.body)
-
-
-  
-//   Favorite.create({ user: _id, ...req.body })
-//     .then((createdFavorite) => res.json(createdFavorite))
-// });
-
-// router.get('/my-favorites', async (req, res) => {
-//   const { _id } = req.payload;
-
-//   try {
-//     const favorites = await Favorite.find({ user: _id });
-//     res.json(favorites);
-//   } catch (error) {
-//     console.error("Error fetching favorites:", error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
-
-// router.get('/my-favorites/:favoriteId', async (req, res) => {
-//   const { favoriteId } = req.params;
-
-//   try {
-//     const favorite = await Favorite.findById(favoriteId);
-//     if (!favorite) {
-//       return res.status(404).json({ message: "Favorite not found" });
-//     }
-    
-//     // Return the content of the favorite
-//     res.json(favorite);
-//   } catch (error) {
-//     console.error("Error fetching favorite content:", error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
-
-
-// module.exports = router
