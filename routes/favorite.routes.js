@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const Favorite = require("../models/Favorite.model");
-const Category = require('../models/Category.model');
 const {isAuthenticated} = require("../middleware/jwt.middleware")
 const mongoose = require("mongoose")
 
@@ -109,40 +108,48 @@ router.delete('/my-favorites/:favoritesId', async (req, res) => {
 });
 
 // POST route for adding a pose to a favorite category
-router.post('/my-favorites/:favoriteId/add-pose', isAuthenticated, async (req, res) => {
-  const { favoriteId } = req.params; 
-  const { english_name, sanskrit_name, pose_description, pose_benefits, url_png } = req.body;
-
-  try {
-    // Find the favorite category by ID
-    const favorite = await Favorite.findById(favoriteId);
-
-    if (!favorite) {
-      return res.status(404).json({ message: 'Favorite category not found' });
-    }
-
-    // Create a new pose object
-    const newPose = {
+router.post(
+  "/my-favorites/:favoriteId/add-pose",
+  isAuthenticated,
+  async (req, res) => {
+    const { favoriteId } = req.params;
+    const {
       english_name,
       sanskrit_name,
       pose_description,
       pose_benefits,
       url_png,
-    };
+    } = req.body;
 
-    // Add the new pose to the favorite category's poses array
-    favorite.poses.push(newPose);
+    try {
+      // Find the favorite category by ID
+      const favorite = await Favorite.findById(favoriteId);
 
-    // Save the updated favorite category
-    await favorite.save();
+      if (!favorite) {
+        return res.status(404).json({ message: "Favorite category not found" });
+      }
 
-    res.status(201).json(newPose); // Return the newly added pose
-  } catch (error) {
-    console.error('Error adding pose to favorite category:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+      // Create a new pose object
+      const newPose = {
+        english_name,
+        sanskrit_name,
+        pose_description,
+        pose_benefits,
+        url_png,
+      };
+
+      // Add the new pose to the favorite category's poses array
+      favorite.poses.push(newPose);
+
+      // Save the updated favorite category
+      await favorite.save();
+
+      res.status(201).json(newPose); // Return the newly added pose
+    } catch (error) {
+      console.error("Error adding pose to favorite category:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
-});
-
-
+);
 
 module.exports = router;
