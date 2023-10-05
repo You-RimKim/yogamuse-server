@@ -78,7 +78,7 @@ router.get('/categories/:categoryId', (req, res, next) => {
   });
    
    
-  // DELETE  /api/categories/:categoryId  -  Deletes a specific category by id
+  //DELETE  /api/categories/:categoryId  -  Deletes a specific category by id
   router.delete('/categories/:categoryId', (req, res, next) => {
     const { categoryId } = req.params;
     

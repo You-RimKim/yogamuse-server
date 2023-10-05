@@ -35,6 +35,7 @@ router.get('/my-favorites', async (req, res) => {
 
   try {
     const favorites = await Favorite.find({ user: _id });
+    console.log(favorites)
     res.json(favorites);
   } catch (error) {
     console.error("Error fetching favorites:", error);
@@ -65,7 +66,7 @@ router.get('/my-favorites/:favoriteId',isAuthenticated , async (req, res) => {
 router.post('/my-favorites', isAuthenticated, async (req, res) => {
   const { _id } = req.payload;
   const { category_name, category_description } = req.body;
-
+  console.log(category_name, category_description)
   try {
     const existingFavorite = await Favorite.findOne({ user: _id, category_name });
 
@@ -80,7 +81,7 @@ router.post('/my-favorites', isAuthenticated, async (req, res) => {
       category_description,
       apiLink: `https://yoga-api-nzy4.onrender.com/v1/categories?name=${category_name}`,
     };
-
+    console.log(favoriteData)
     const newFavorite = await Favorite.create(favoriteData);
     res.status(201).json(newFavorite);
   } catch (error) {
@@ -90,14 +91,19 @@ router.post('/my-favorites', isAuthenticated, async (req, res) => {
 });
 
 // DELETE route for deleting a category by its ID
-router.delete('/my-favorites/:categoryId', async (req, res) => {
+router.delete('/my-favorites/:favoritesId', async (req, res) => {
   try {
-    const categoryId = req.params.categoryId;
+    const favoritesId = req.params.favoritesId;
 
-    await Category.findByIdAndRemove(categoryId);
-    res.status(200).json({ message: 'Category deleted successfully' });
+    await Favorite.findByIdAndRemove(favoritesId);
+
+    console.log(favoritesId)
+
+    
+
+    res.status(200).json({ message: 'Favorite deleted successfully' });
   } catch (error) {
-    console.error('Error deleting category:', error);
+    console.error('Error deleting favorite:', error);
     res.status(500).json({ message: 'Server error', error });
   }
 });

@@ -16,8 +16,4 @@ router.get("/user", (req, res, next) => {
   res.json("here are all the users");
 });
 
-router.get("/my-favorites", (req, res, next) => {
-  res.json("here are all the favorites");
-});
-
 module.exports = router;
